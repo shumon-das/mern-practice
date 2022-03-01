@@ -1,8 +1,21 @@
 
+const mysql = require('mysql');
+var con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: 'react-node'
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+});
+
 const users = {}
 
 // select all users
-users.selectAllUsers = (con, response) => {
+users.selectAllUsers = (response) => {
     con.query("SELECT * FROM `users`", (getUsersErr, getUsersRes) => {
         if(!getUsersErr){
             response.send(getUsersRes)
@@ -14,7 +27,7 @@ users.selectAllUsers = (con, response) => {
 
 
 // select an single user
-users.selectAnUserById = (con, id, response) => {
+users.selectAnUserById = (id, response) => {
     if(id){
         con.query("SELECT * FROM `users` WHERE id = ?", id, (getUserErr, getUserRes) => {
             if(!getUserErr){
@@ -30,7 +43,7 @@ users.selectAnUserById = (con, id, response) => {
 
 
 // select multiple users by there ids
-users.selectMultipleUsersByIds = (con, request, response) => {
+users.selectMultipleUsersByIds = (request, response) => {
     let ids = request.headers['ids']
     if(ids){
         const reqIds = request.headers['ids'].split(',');
@@ -49,7 +62,7 @@ users.selectMultipleUsersByIds = (con, request, response) => {
 
 
 // insert new user into db
-users.insertNewUser = (con, request, response) => {
+users.insertNewUser = (request, response) => {
     let first_name = typeof(request.body.first_name) === 'string'
                         && request.body.first_name
                         ?  request.body.first_name
@@ -106,7 +119,7 @@ users.insertNewUser = (con, request, response) => {
 
 
 // update specific user info
-users.updateUserById = (con, request, response) => {
+users.updateUserById = (request, response) => {
     const id = typeof(request.body.id) === 'string'
                  && request.body.id 
                  ?  parseInt(request.body.id) 
@@ -163,7 +176,7 @@ users.updateUserById = (con, request, response) => {
 
 
 // delete an user
-users.deleteUserById = (con, id, response) => {
+users.deleteUserById = (id, response) => {
     con.query("SELECT id FROM `users` WHERE id = ?", id, (getUserErr, getUserRes) => {
         if(!getUserErr){
             let dbId = getUserRes.length
